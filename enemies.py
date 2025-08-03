@@ -1,9 +1,10 @@
-import pygame
-import random
+import pygame, random
 
 WIDTH = 800
 HEIGHT = 600
+
 BLACK = (0, 0, 0)
+
 
 class Meteor(pygame.sprite.Sprite):
     def __init__(self):
