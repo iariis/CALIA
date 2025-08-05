@@ -1,59 +1,106 @@
 import pygame
 from player import Player
-from enemies import Meteor
-from bullet import Bullet
-
+from meteors import Meteor
+# Dimensiones de la ventana
 WIDTH = 800
 HEIGHT = 600
-BLACK = (0, 0, 0)
-
+# Inicialización de Pygame
 pygame.init()
-pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Shooter")
 clock = pygame.time.Clock()
-
-background = pygame.image.load("assets/background.png").convert()
-
+def show_start_screen():
+    screen.fill((0, 0, 0))  # Rellenar la pantalla con negro
+    font = pygame.font.Font(None, 74)  # Crear una fuente
+    text = font.render("Press Enter to Play", True, (255, 255, 255))  # Texto blanco
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))  # Centrar el texto
+    screen.blit(text, text_rect)  # Dibujar el texto
+    pygame.display.flip()  # Actualizar la pantalla
+    # Esperar a que el jugador presione Enter
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:  # Tecla Enter
+                    waiting = False
+def show_game_over_screen(shots_fired):
+    screen.fill((0, 0, 0))  # Rellenar la pantalla con negro
+    font = pygame.font.Font(None, 74)  # Crear una fuente
+    text = font.render("Game Over", True, (255, 0, 0))  # Texto rojo
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))  # Centrar el texto
+    screen.blit(text, text_rect)  # Dibujar el texto
+    # Mostrar el número de disparos
+    shots_text = font.render(f"Disparos: {shots_fired}", True, (255, 255, 255))  # Texto blanco
+    shots_rect = shots_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))  # Centrar el texto
+    screen.blit(shots_text, shots_rect)  # Dibujar el texto
+    pygame.display.flip()  # Actualizar la pantalla
+    # Esperar a que el jugador presione Enter para reiniciar
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:  # Tecla Enter
+                    waiting = False
+# Grupos de sprites
 all_sprites = pygame.sprite.Group()
-meteor_list = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
-
 player = Player(all_sprites, bullets)
-all_sprites.add(player)
-
-for i in range(8):
+show_start_screen()
+# Crear meteoros iniciales
+for _ in range(8):
     meteor = Meteor()
     all_sprites.add(meteor)
-    meteor_list.add(meteor)
-
+# Contador de colisiones y disparos
+collision_count = 0
+collision_limit = 4  # Número máximo de colisiones permitidas
+shots_fired = 0  # Contador de disparos
+# Bucle principal del juego
 running = True
 while running:
-    clock.tick(60)
+    clock.tick(60)  # Limitar a 60 FPS
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                player.shoot()
-
+                player.shoot()  # Disparar
+                shots_fired += 1  # Incrementar contador de disparos
+    # Actualizar todos los sprites
     all_sprites.update()
-
-    # Colisiones meteoro - laser
-    hits = pygame.sprite.groupcollide(meteor_list, bullets, True, True)
-    for hit in hits:
-        meteor = Meteor()
-        all_sprites.add(meteor)
-        meteor_list.add(meteor)
-
     # Colisiones jugador - meteoro
-    hits = pygame.sprite.spritecollide(player, meteor_list, False)
-    if hits:
-        running = False
-
-    screen.blit(background, [0, 0])
+    hits = pygame.sprite.spritecollide(player, all_sprites, False)
+    for hit in hits:
+        if isinstance(hit, Meteor):  # Verifica si el sprite colisionado es un meteoro
+            collision_count += 1
+            hit.kill()  # Elimina el meteoro
+            print(f"Colisiones: {collision_count}/{collision_limit}")
+            # Generar un nuevo meteoro
+            new_meteor = Meteor()
+            all_sprites.add(new_meteor)
+            if collision_count >= collision_limit:
+                print("¡Game Over!")
+                show_game_over_screen(shots_fired)  # Mostrar pantalla de Game Over
+                running = False  # Termina el juego si se alcanzó el límite
+    # Dibujar todo
+    screen.fill((0, 0, 0))  # Rellenar la pantalla con negro
     all_sprites.draw(screen)
-    pygame.display.flip()
-
+    # Mostrar el contador de disparos
+    font = pygame.font.Font(None, 36)
+    shots_text = font.render(f"Disparos: {shots_fired}", True, (255, 255, 255))
+    screen.blit(shots_text, (10, 10))  # Mostrar en la esquina superior izquierda
+    # Mostrar la barra de vida
+    life_bar_width = 200
+    life_bar_height = 20
+    life_bar_x = 10
+    life_bar_y = 50
+    life_percentage = (1 - (collision_count / collision_limit)) * life_bar_width
+    pygame.draw.rect(screen, (0, 255, 0), (life_bar_x, life_bar_y, life_percentage, life_bar_height))  # Barra verde
+    pygame.draw.rect(screen, (255, 0, 0), (life_bar_x, life_bar_y, life_bar_width, life_bar_height), 2)  # Contorno de la barra
+    pygame.display.flip()  # Actualizar la pantalla
 pygame.quit()

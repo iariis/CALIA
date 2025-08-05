@@ -1,18 +1,16 @@
 import pygame
 
-BLACK = (0, 0, 0)
-
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("assets/laser1.png").convert()
-        self.image.set_colorkey(BLACK)
+        self.image = pygame.Surface((5, 10))
+        self.image.fill((255, 255, 0))  # Amarillo
         self.rect = self.image.get_rect()
-        self.rect.y = y
         self.rect.centerx = x
-        self.speedy = -10
+        self.rect.bottom = y
+        self.speed = -10
 
     def update(self):
-        self.rect.y += self.speedy
+        self.rect.y += self.speed
         if self.rect.bottom < 0:
             self.kill()
