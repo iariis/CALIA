@@ -2,7 +2,7 @@ import pygame
 import sounds_music
 from player import Player
 from meteors import Meteor
-
+from explosions import Explosion
 # Dimensiones de la ventana
 WIDTH = 800
 HEIGHT = 600
@@ -11,6 +11,18 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Shooter")
 clock = pygame.time.Clock()
+
+
+# Cargar animaciones de explosión
+explosion_anim = []
+for i in range(9):
+    file = f"assets/regularExplosion0{i}.png"
+    img = pygame.image.load(file).convert()
+    img.set_colorkey((0, 0, 0))
+    img_scale = pygame.transform.scale(img, (70, 70))
+    explosion_anim.append(img_scale)
+
+
 def show_start_screen():
     screen.fill((0, 0, 0))  # Rellenar la pantalla con negro
     font = pygame.font.Font(None, 74)  # Crear una fuente
@@ -81,6 +93,9 @@ while running:
         if isinstance(hit, Meteor):  # Verifica si el sprite colisionado es un meteoro
             collision_count += 1
             hit.kill()  # Elimina el meteoro
+            explosion = Explosion(hit.rect.center, explosion_anim)
+            all_sprites.add(explosion)
+
             print(f"Colisiones: {collision_count}/{collision_limit}")
             # Generar un nuevo meteoro
             new_meteor = Meteor()
@@ -106,6 +121,7 @@ while running:
     pygame.draw.rect(screen, (255, 0, 0), (life_bar_x, life_bar_y, life_bar_width, life_bar_height), 2)  # Contorno de la barra
     pygame.display.flip()  # Actualizar la pantalla
 pygame.quit()
+
 # -------------------- ESCUDOS --------------------
 # Esta sección agrega el concepto de "shields" sin modificar el código original
 
@@ -151,11 +167,15 @@ while running:
                 collision_count += 1
                 print(f"Colisiones: {collision_count}/{collision_limit}")
             hit.kill()
+            explosion = Explosion(hit.rect.center, explosion_anim)
+            all_sprites.add(explosion)
+
             new_meteor = Meteor()
             all_sprites.add(new_meteor)
             if collision_count >= collision_limit:
                 print("¡Game Over!")
                 show_game_over_screen(shots_fired)
+                
                 running = False
 
     screen.fill((0, 0, 0))
