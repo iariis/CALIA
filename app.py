@@ -1,6 +1,8 @@
 import pygame
+import sounds_music
 from player import Player
 from meteors import Meteor
+
 # Dimensiones de la ventana
 WIDTH = 800
 HEIGHT = 600
@@ -103,4 +105,79 @@ while running:
     pygame.draw.rect(screen, (0, 255, 0), (life_bar_x, life_bar_y, life_percentage, life_bar_height))  # Barra verde
     pygame.draw.rect(screen, (255, 0, 0), (life_bar_x, life_bar_y, life_bar_width, life_bar_height), 2)  # Contorno de la barra
     pygame.display.flip()  # Actualizar la pantalla
+pygame.quit()
+# -------------------- ESCUDOS --------------------
+# Esta sección agrega el concepto de "shields" sin modificar el código original
+
+# Reiniciar Pygame si querés iniciar una segunda partida con escudos
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Shooter con Escudos")
+clock = pygame.time.Clock()
+
+# Número de escudos
+shields = 2
+
+# Repetimos el juego, pero con escudos activos
+all_sprites = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
+player = Player(all_sprites, bullets)
+for _ in range(8):
+    meteor = Meteor()
+    all_sprites.add(meteor)
+
+collision_count = 0
+shots_fired = 0
+running = True
+while running:
+    clock.tick(60)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.shoot()
+                shots_fired += 1
+
+    all_sprites.update()
+
+    hits = pygame.sprite.spritecollide(player, all_sprites, False)
+    for hit in hits:
+        if isinstance(hit, Meteor):
+            if shields > 0:
+                shields -= 1
+                print(f"¡Escudo usado! Escudos restantes: {shields}")
+            else:
+                collision_count += 1
+                print(f"Colisiones: {collision_count}/{collision_limit}")
+            hit.kill()
+            new_meteor = Meteor()
+            all_sprites.add(new_meteor)
+            if collision_count >= collision_limit:
+                print("¡Game Over!")
+                show_game_over_screen(shots_fired)
+                running = False
+
+    screen.fill((0, 0, 0))
+    all_sprites.draw(screen)
+
+    font = pygame.font.Font(None, 36)
+    shots_text = font.render(f"Disparos: {shots_fired}", True, (255, 255, 255))
+    screen.blit(shots_text, (10, 10))
+
+    # Barra de vida
+    life_bar_width = 200
+    life_bar_height = 20
+    life_bar_x = 10
+    life_bar_y = 50
+    life_percentage = (1 - (collision_count / collision_limit)) * life_bar_width
+    pygame.draw.rect(screen, (0, 255, 0), (life_bar_x, life_bar_y, life_percentage, life_bar_height))
+    pygame.draw.rect(screen, (255, 0, 0), (life_bar_x, life_bar_y, life_bar_width, life_bar_height), 2)
+
+    # Mostrar escudos
+    shield_text = font.render(f"Escudos: {shields}", True, (0, 191, 255))  # Azul celeste
+    screen.blit(shield_text, (10, 80))
+
+    pygame.display.flip()
+
 pygame.quit()
