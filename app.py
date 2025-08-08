@@ -3,6 +3,7 @@ import sounds_music
 from player import Player
 from meteors import Meteor
 from explosions import Explosion
+from laser_collisions import check_laser_collisions
 # Dimensiones de la ventana
 WIDTH = 800
 HEIGHT = 600
@@ -11,6 +12,8 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Shooter")
 clock = pygame.time.Clock()
+background = pygame.image.load("assets/background.png").convert()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # para que cubra toda la pantalla
 
 
 # Cargar animaciones de explosión
@@ -40,40 +43,77 @@ def show_start_screen():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:  # Tecla Enter
                     waiting = False
+
 def show_game_over_screen(shots_fired):
-    screen.fill((0, 0, 0))  # Rellenar la pantalla con negro
-    font = pygame.font.Font(None, 74)  # Crear una fuente
-    text = font.render("Game Over", True, (255, 0, 0))  # Texto rojo
-    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))  # Centrar el texto
-    screen.blit(text, text_rect)  # Dibujar el texto
-    # Mostrar el número de disparos
-    shots_text = font.render(f"Disparos: {shots_fired}", True, (255, 255, 255))  # Texto blanco
-    shots_rect = shots_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))  # Centrar el texto
-    screen.blit(shots_text, shots_rect)  # Dibujar el texto
-    pygame.display.flip()  # Actualizar la pantalla
-    # Esperar a que el jugador presione Enter para reiniciar
-    waiting = True
-    while waiting:
+    screen.fill((0, 0, 0))  # Fondo negro
+    font_big = pygame.font.Font(None, 74)
+    font_small = pygame.font.Font(None, 36)
+
+    text = font_big.render("GAME OVER", True, (255, 0, 0))
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
+    screen.blit(text, text_rect)
+
+    shots_text = font_small.render(f"Disparos: {shots_fired}", True, (255, 255, 255))
+    shots_rect = shots_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(shots_text, shots_rect)
+
+    restart_text = font_small.render("Presiona R para reiniciar", True, (255, 255, 255))
+    restart_rect = restart_text.get_rect(center=(WIDTH // 2, HEIGHT * 3 // 4 - 20))
+    screen.blit(restart_text, restart_rect)
+
+    quit_text = font_small.render("Presiona Q para salir", True, (255, 255, 255))
+    quit_rect = quit_text.get_rect(center=(WIDTH // 2, HEIGHT * 3 // 4 + 20))
+    screen.blit(quit_text, quit_rect)
+
+    pygame.display.flip()
+
+    while True:
+        clock.tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:  # Tecla Enter
-                    waiting = False
+                if event.key == pygame.K_r:
+                    return "restart"
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    exit()
+
+
+    pygame.display.flip()
+
+    while True:
+        clock.tick(60)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    return "restart"
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    exit()
+
 # Grupos de sprites
 all_sprites = pygame.sprite.Group()
+meteor_group = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 player = Player(all_sprites, bullets)
 show_start_screen()
+
 # Crear meteoros iniciales
 for _ in range(8):
     meteor = Meteor()
     all_sprites.add(meteor)
+    meteor_group.add(meteor)
 # Contador de colisiones y disparos
 collision_count = 0
 collision_limit = 4  # Número máximo de colisiones permitidas
 shots_fired = 0  # Contador de disparos
+score = [0]  # Lista para poder modificar dentro de la función
+
 # Bucle principal del juego
 running = True
 while running:
@@ -87,6 +127,16 @@ while running:
                 shots_fired += 1  # Incrementar contador de disparos
     # Actualizar todos los sprites
     all_sprites.update()
+    # Colisiones láser - meteoros
+    game_over = check_laser_collisions(
+        bullets,
+        meteor_group,
+        all_sprites,
+        player,
+        score,
+        explosion_anim
+    )
+
     # Colisiones jugador - meteoro
     hits = pygame.sprite.spritecollide(player, all_sprites, False)
     for hit in hits:
@@ -95,17 +145,38 @@ while running:
             hit.kill()  # Elimina el meteoro
             explosion = Explosion(hit.rect.center, explosion_anim)
             all_sprites.add(explosion)
+            sounds_music.explosion_sound.play()
 
             print(f"Colisiones: {collision_count}/{collision_limit}")
             # Generar un nuevo meteoro
             new_meteor = Meteor()
             all_sprites.add(new_meteor)
+            meteor_group.add(new_meteor)
             if collision_count >= collision_limit:
                 print("¡Game Over!")
-                show_game_over_screen(shots_fired)  # Mostrar pantalla de Game Over
-                running = False  # Termina el juego si se alcanzó el límite
+                action = show_game_over_screen(shots_fired)  # Ahora recibe la acción
+                if action == "restart":
+                    # Reiniciar variables y grupos para empezar de nuevo
+                    collision_count = 0
+                    shots_fired = 0
+                    score[0] = 0
+
+                    all_sprites.empty()
+                    meteor_group.empty()
+                    bullets.empty()
+
+                    player = Player(all_sprites, bullets)
+                    for _ in range(8):
+                        meteor = Meteor()
+                        all_sprites.add(meteor)
+                        meteor_group.add(meteor)
+                    continue  # Sigue el loop principal reiniciado
+                else:
+                    running = False
+                    break
+
     # Dibujar todo
-    screen.fill((0, 0, 0))  # Rellenar la pantalla con negro
+    screen.blit(background, (0, 0))
     all_sprites.draw(screen)
     # Mostrar el contador de disparos
     font = pygame.font.Font(None, 36)
@@ -122,10 +193,8 @@ while running:
     pygame.display.flip()  # Actualizar la pantalla
 pygame.quit()
 
-# -------------------- ESCUDOS --------------------
-# Esta sección agrega el concepto de "shields" sin modificar el código original
 
-# Reiniciar Pygame si querés iniciar una segunda partida con escudos
+# escudos
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Shooter con Escudos")
@@ -134,7 +203,6 @@ clock = pygame.time.Clock()
 # Número de escudos
 shields = 2
 
-# Repetimos el juego, pero con escudos activos
 all_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 player = Player(all_sprites, bullets)

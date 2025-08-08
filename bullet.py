@@ -3,8 +3,8 @@ import pygame
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((5, 10))
-        self.image.fill((255, 255, 0))  # Amarillo
+        self.image = pygame.image.load("assets/laser1.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (10, 30))
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y

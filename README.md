@@ -1,58 +1,28 @@
-📌 SUPER IMPORTANTE, LEER!
-✅ 1. Crear la carpeta del proyecto
-Abrir el explorador de archivos.
+☄️CALIA Meteors
+👥 Integrantes
+Iara Fernandez
+Carolina Lopez
+Lara Magallanes
+Adriana Atunez
+🎯 Descripción del Proyecto
+Versión modificada del videojuego clásico "Anti-Aircraft" en el cual una nave tiene el objetivo de disparar a meteoros con las caras de los integrantes sin que estos choquen la nave 
 
-Crear una carpeta nueva llamada por ejemplo CALIA.
-
-✅ 2. Abrir Visual Studio Code
-Dentro de VS Code, hacer: File > Open Folder y abrir la carpeta CALIA.
-
-✅ 3. Clonar el repositorio desde GitHub
-Abrir la terminal de VS Code (Ctrl + ñ) y escribir:
-
-git clone https://github.com/iariis/CALIA.git
-
-Esto va a descargar el proyecto completo.
-Luego, entrar a la carpeta del proyecto clonado:
-
-cd CALIA
-
-✅ 4. Crear y activar el entorno virtual (solo una vez)
-
-python -m venv .venv
-.\.venv\Scripts\activate
-
-SIEMPRE TIENEN QUE CREARLO Y ACTIVARLO
-
-✅ 5. Instalar pygame
-Una vez activado el entorno:
-
+Configuración del entorno
+1. Crear un entorno virtual
+En Linux / macOS:
+python3 -m venv <nombre_del_entorno>
+En Windows:
+python -m venv <nombre_del_entorno>
+2. Activar el entorno virtual
+En Linux / macOS:
+source <nombre_del_entorno>/bin/activate
+En Windows:
+<nombre_del_entorno>\Scripts\activate
+3. Clona el repositorio:
+git clone <url_del_repositorio>
+4. Accede al directorio del proyecto:
+cd <nombre_del_proyecto>
+5. Instalar pygame:
 pip install pygame
-(Esto es lo único que necesitan instalar )
-
-🔃 RAMAS Y TRABAJO INDIVIDUAL
-✅ 6. Crear su propia rama
-
-git checkout -b nombre-de-su-rama
-Por ejemplo: git checkout -b lara
-
-🚨 MUY IMPORTANTE SIEMPRE ANTES DE SUBIR ALGO PROBAR SI ANDA CON
-
-app.py
-
-lo que yo hice primero fué ver los videos pero él hace todo en app.py, nsotras debemos modulizar así que le mandé al chat para que me separara por archicos lo que hice
-
-🚀 FLUJO PARA SUBIR CAMBIOS
-Después de hacer sus partes:
-
-git add .
-git commit -m "Agregué [lo que hayan hecho]"
-git push origin su-rama
-🔁 Merge Final
-Cuando todas hayan terminado, alguien que esté a cargo hace lo siguiente:
-
-git checkout main
-git pull origin main
-git merge nombre-de-la-rama
-git push origin main
-Se repite ese proceso por cada rama que quieran fusionar.
+6. Ejecuta la aplicación:
+python app.py
