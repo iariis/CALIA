@@ -10,7 +10,7 @@ HEIGHT = 600
 # Inicialización de Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Shooter")
+pygame.display.set_caption("CALI")
 clock = pygame.time.Clock()
 background = pygame.image.load("assets/background.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # para que cubra toda la pantalla
