@@ -1,36 +1,13 @@
 import pygame
-from enemies import Meteor  
 
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = pygame.image.load("assets/laser1.png")
-        self.image.set_colorkey((0, 0, 0))  # BLACK
-        self.rect = self.image.get_rect()
-        self.rect.y = y
-        self.rect.centerx = x
-        self.speedy = -10
+def check_laser_collisions(bullets, meteor_list, all_sprites, player_group, player, score):
+    # Colisión entre balas y meteoritos
+    collisions = pygame.sprite.groupcollide(meteor_list, bullets, True, True)
+    for meteor in collisions:
+        score[0] += 10  # Aumenta el puntaje cuando se destruye un meteorito
 
-    def update(self):
-        self.rect.y += self.speedy
-        if self.rect.bottom < 0:
-            self.kill()
+    # Colisión entre meteoritos y el jugador
+    if pygame.sprite.spritecollideany(player, meteor_list):
+        return True  # Si el jugador fue alcanzado, devolver True
 
-# Función para chequear colisiones
-def check_laser_collisions(lasers, meteors, all_sprites, explosion_sound, score, player):
-    # Colisión láseres vs meteoritos
-    hits = pygame.sprite.groupcollide(meteors, lasers, True, True)
-    for hit in hits:
-        score[0] += 10
-        explosion_sound.play()
-        m = Meteor()
-        all_sprites.add(m)
-        meteors.add(m)
-
-    # Colisión meteoritos vs jugador
-    player_hits = pygame.sprite.spritecollide(player, meteors, False)
-    if player_hits:
-        return True  # El jugador fue golpeado
-
-    return False  # No hubo colisión con el jugador
-
+    return False
