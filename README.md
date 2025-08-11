@@ -13,8 +13,14 @@ Adriana Atunez
 
 Versión reinventada del clásico videojuego “Anti-Aircraft” donde una nave debe disparar a meteoros que llevan las caras de los integrantes, evitando que choquen contra ella.
 
-## 🎥 Demoatracuón del Juego
-[link del video](https://youtu.be/697w31Fl3I4)
+## Capturas de Pantalla
+
+![Pantalla de Inicio](screenshots/inicio.png)  
+![Juego en acción](screenshots/juego.png)  
+![Pantalla de Game Over](screenshots/gameover.png)
+
+## 🎥 Demostración del Juego
+[Toca para ver el video](https://youtu.be/697w31Fl3I4)
 
 ### 🧩 Patrones de Diseño Aplicados
 
