@@ -5,8 +5,7 @@
 Iara Fernandez
 Carolina Lopez
 Lara Magallanes
-Adriana Atunez
-
+Adriana Antunez
 ---
 
 ### 🎯 Descripción del Proyecto
@@ -19,8 +18,31 @@ Versión reinventada del clásico videojuego “Anti-Aircraft” donde una nave 
 ![Juego en acción](screenshots/juego.png)  
 ![Pantalla de Game Over](screenshots/gameover.png)
 
-## 🎥 Demostración del Juego
+## Demostración del Juego
 [Toca para ver el video](https://youtu.be/697w31Fl3I4)
+
+### Reglas Básicas del Juego
+
+1. **Objetivo:**  
+   Destruir todos los meteoros que bajan antes de que choquen con tu nave.
+
+2. **Controles:**  
+   - ⬅️ Flecha izquierda: mover nave a la izquierda  
+   - ➡️ Flecha derecha: mover nave a la derecha  
+   - 🔫 Barra espaciadora: disparar  
+
+3. **Puntaje:**  
+   - +10 puntos por cada meteoro destruido.  
+   - El marcador se muestra en pantalla en tiempo real.
+
+4. **Fin del Juego:**  
+   - Si un meteoro choca con tu nave, el juego termina.  
+   - Aparece la pantalla de “Game Over” con el total de disparos realizados.  
+
+5. **Reinicio:**  
+   - Presionar **R** para reiniciar el juego.  
+   - Presionar **Q** para salir.
+
 
 ### 🧩 Patrones de Diseño Aplicados
 
